@@ -1,0 +1,2 @@
+{%- from "influxdb/map.jinja" import influxdb with context %}
+machine localhost login root password {{ influxdb.root_pass }}

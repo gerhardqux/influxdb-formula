@@ -1,0 +1,31 @@
+# vi: set ft=yaml :
+influxdb:
+  version: latest
+  install_method: url
+
+  root_pass: root
+
+  databases:
+    metrics:
+      users:
+        metrics: metrics
+
+  bind-address: 0.0.0.0
+  logging:
+    level: info
+    directory: /var/log/influxdb
+  admin:
+    port: 8083
+  api:
+    port: 8086
+  raft:
+    port: 8090
+  protobuf:
+    port: 8099
+
+  signatures:
+    influxdb-0.9.2-1.x86_64.rpm: d5b38570184eff0061d8ee62776e24c08f3fb2de2787f240ffea7faec03e143f
+    influxdb-0.8.8-1.x86_64.rpm: 861ffccd6eec8fd67f2446494944e7d0d775ebf8371818ed60266332b767a611  
+    influxdb_0.9.2_amd64.deb: 6177e4c05fbd25cece97c29a67284081ee438c798c3680f7c3d21d2f7265ef39
+    influxdb_0.8.8_amd64.deb: 04f0b74ca102e2680191bbd83aa2601cd7ce1b50b3fd8aa7d7d084fa7032c492
+

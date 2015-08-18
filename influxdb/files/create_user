@@ -1,0 +1,8 @@
+#!/bin/sh
+
+DBNAME=$1
+DBUSER=$2
+DBPASS=$3
+
+curl -si --netrc-file /root/.influxdbpwd -X POST "http://localhost:8086/db/$DBNAME/users" -d '{"name": "'$DBUSER'", "password": "'$DBPASS'"}' | grep '200 OK'
+

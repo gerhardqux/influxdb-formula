@@ -1,15 +1,37 @@
 # vi: set ft=sls :
-# WARNING: This file is managed by Salt
-# DO NOT EDIT MANUALLY
+# This file is managed by Salt. Edit influxdb/files/config.toml.jinja
 
 {% from "influxdb/map.jinja" import influxdb with context %}
 
-# If hostname (on the OS) doesn't return a name that can be resolved by the other
-# systems in the cluster, you'll have to set the hostname to an IP or something
-# that can be resolved here.
-# hostname = ""
+reporting-disabled = true
 
-bind-address = "{{ influxdb["bind-address"] }}"
+[meta]
+  dir = "/var/lib/influxdb/meta"
+  hostname = "localhost"
+  bind-address = "{{ influxdb["bind-address"] }}"
+  retention-autocreate = true
+  election-timeout = "1s"
+  heartbeat-timeout = "1s"
+  leader-lease-timeout = "500ms"
+  commit-timeout = "50ms"
+
+[data]
+  dir = "/var/lib/influxdb/data"
+  max-wal-size = 104857600
+  wal-flush-interval = "10m0s"
+  wal-partition-flush-delay = "2s"
+
+[retention]
+  enabled = true
+  check-interval = "10m0s"
+
+[hinted-handoff]
+  enabled = true
+  dir = "/var/lib/influxdb/hh"
+  max-size = 1073741824
+  max-age = "168h0m0s"
+  retry-rate-limit = 0
+  retry-interval = "1s"
 
 [logging]
 # logging level can be one of "debug", "info", "warn" or "error"
@@ -30,9 +52,15 @@ port = {{ influxdb["api"]["port"] }} # binding is disabled if the port isn't set
 # connections will timeout after this amount of time. Ensures that clients that misbehave
 # and keep alive connections they don't use won't end up connection a million times.
 # However, if a request is taking longer than this to complete, could be a problem.
-read-timeout = "5s"
+read-timeout = "10s"
 
 [input_plugins]
+
+[input_plugins.collectd]
+enabled = true
+port = 8096
+database = "metrics"
+typesdb = "/usr/share/collectd/types.db"
 
 # Configure the graphite api
 [input_plugins.graphite]
@@ -40,6 +68,7 @@ enabled = false
 # port = 2003
 # database = ""  # store graphite data in this database
 # udp_enabled = true # enable udp interface on the same port as the tcp interface
+
 [input_plugins.udp]
 enabled = false
 # port = 4444
@@ -65,6 +94,14 @@ dir = "/opt/influxdb/shared/data/db"
 write-buffer-size = 10000
 
 [cluster]
+  write-timeout = "5s"
+  shard-writer-timeout = "5s"
+
+[shard-precreation]
+  enabled = true
+  check-interval = "10m0s"
+  advance-period = "30m0s"
+
 # A comma separated list of servers to seed
 # this server. this is only relevant when the
 # server is joining a new cluster. Otherwise
@@ -163,7 +200,7 @@ split = 1
 # split-random = "/^hf.*/"
 
 [sharding.long-term]
-duration = "30d"
+duration = "90d"
 split = 1
 # split-random = "/^Hf.*/"
 

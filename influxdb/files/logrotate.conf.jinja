@@ -1,6 +1,5 @@
 # vi: set ft=sls :
-# WARNING: This file is managed by Salt
-# DO NOT EDIT MANUALLY
+# This file is managed by Salt. Edit influxdb/files/logrotate.conf.jinja
 
 {{ pillar["influxdb"]["logging"]["directory"] }}/*.log {
   daily

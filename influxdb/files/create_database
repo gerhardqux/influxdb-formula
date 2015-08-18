@@ -1,0 +1,6 @@
+#!/bin/sh
+
+DBNAME=$1
+
+curl -si --netrc-file /root/.influxdbpwd -X POST 'http://localhost:8086/db' -d '{"name": "'$DBNAME'"}' | grep '201 Created'
+

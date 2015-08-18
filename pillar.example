@@ -1,6 +1,13 @@
 # vi: set ft=yaml :
 influxdb:
+  # version defaults to 'latest'
   version: 0.9.2
+
+  databases:
+    metrics:
+      users:
+        metrics: metrics
+
   bind-address: 0.0.0.0
   logging:
     level: info

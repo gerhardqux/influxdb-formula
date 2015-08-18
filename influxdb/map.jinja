@@ -1,24 +1,43 @@
-# vi: set ft=sls :
-{%
-  set influxdb = {
-    "bind-address" : "0.0.0.0",
-    "logging" : {
-      "level" : "info",
-      "directory": "/var/log/influxdb"
-    },
-    "admin" : {
-      "port" : "8083"
-    },
-    "api" : {
-      "port" : "8086"
-    },
-    "raft" : {
-      "port" : "8090"
-    },
-    "protobuf" : {
-      "port" : "8083"
-    }
-  }
+# vim: ft=jinja
+
+{% import_yaml 'influxdb/defaults.yaml' as defaults %}
+
+{##
+
+  Import the influxdb structure from this file. It contains all the variables
+  for the influxdb states.
+
+  The variables are derived from the following sources, in this order:
+
+  1. Start with defaults from defaults.yaml (defaults)
+  2. Override with os_family specific settings (os_override)
+  3. Finally override with pillar (influxdb)
+
+  I'm aware grains.filter_by can do all the merging, but I think the
+  code below is easier to understand than a single call to filter_by.
+
+##}
+
+{% set os_override = salt['grains.filter_by']({
+    'Debian': {},
+    'Arch': {},
+    'RedHat': {},
+  },
+  grain="os_family",
+)
 %}
 
-{% do influxdb.update(salt["pillar.get"]("influxdb")) %}
+{% set influxdb = {} %}}
+{% do influxdb.update(defaults['influxdb']) %}
+{% do influxdb.update(os_override) %}
+{% do influxdb.update(salt['pillar.get']('influxdb')) %}
+
+{## Compose the filename if it hasn't been overridden above ##}
+{% if influxdb.filename is not defined %}
+{%  if grains['os_family'] == 'Debian' %}
+{%   do influxdb.update({"filename": "influxdb_" + influxdb['version'] + "_" + grains['osarch'] + ".deb"}) %}
+{%  else %}
+{%   do influxdb.update({"filename": "influxdb-" + influxdb['version'] + "-1." + grains['osarch'] + ".rpm"}) %}
+{%  endif %}
+{% endif %}
+{% do influxdb.update({ "filename_sha256": influxdb['signatures'][influxdb['filename']] }) %}
