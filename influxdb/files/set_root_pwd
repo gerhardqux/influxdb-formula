@@ -7,7 +7,8 @@ PASS='{{ influxdb.root_pass }}'
 #	PASS=$(openssl rand -hex 10)
 #fi
 
-echo "machine localhost login root password $PASS" > /root/.influxdbpwd
+touch /root/.influxdbpwd
 chmod 0600 /root/.influxdbpwd
+echo "machine localhost login root password $PASS" > /root/.influxdbpwd
 curl -si 'http://localhost:8086/cluster_admins/root?u=root&p=root' -d '{"password": "{{ influxdb.root_pass }}"}' | grep '200 OK'
 
